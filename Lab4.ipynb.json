@@ -1,0 +1,904 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Lab 4"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## import python libraries, connect to database"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas\n",
+    "import configparser\n",
+    "import psycopg2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 85,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "config = configparser.ConfigParser()\n",
+    "config.read('config.ini')\n",
+    "\n",
+    "host = config['myaws']['host']\n",
+    "db=config['myaws']['db']\n",
+    "user=config['myaws']['user']\n",
+    "pwd=config['myaws']['pwd']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 86,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "conn = psycopg2.connect(\n",
+    "                        host = host,\n",
+    "                        user = user,\n",
+    "                        password = pwd,\n",
+    "                        dbname=db\n",
+    "                        ) "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 87,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cur=conn.cursor() "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Q1"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sql_q1 = \"\"\"\n",
+    "            select * from gp8.student\n",
+    "            \"\"\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>s_email</th>\n",
+       "      <th>s_name</th>\n",
+       "      <th>major</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>branicab@dukes.jmu.edu</td>\n",
+       "      <td>Alex Branick</td>\n",
+       "      <td>IA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>s1@dukes.jmu.edu</td>\n",
+       "      <td>S1</td>\n",
+       "      <td>IA\\n</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>s2@dukes.jmu.edu</td>\n",
+       "      <td>S2</td>\n",
+       "      <td>POSC</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>s3@dukes.jmu.edu</td>\n",
+       "      <td>S3</td>\n",
+       "      <td>IA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>s4@dukes.jmu.edu</td>\n",
+       "      <td>S4</td>\n",
+       "      <td>POSC</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                  s_email        s_name major\n",
+       "0  branicab@dukes.jmu.edu  Alex Branick    IA\n",
+       "1        s1@dukes.jmu.edu            S1  IA\\n\n",
+       "2        s2@dukes.jmu.edu            S2  POSC\n",
+       "3        s3@dukes.jmu.edu            S3    IA\n",
+       "4        s4@dukes.jmu.edu            S4  POSC"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df= pandas.read_sql_query(sql_q1,conn)\n",
+    "df[:] "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Q2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sql_q2 = \"\"\"\n",
+    "        select gp8.professor.p_name,\n",
+    "        gp8.course.course_name\n",
+    "        from gp8.professor\n",
+    "        inner join gp8.course\n",
+    "        on gp8.professor.p_email = gp8.course.p_email\n",
+    "        \n",
+    "        \"\"\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>p_name</th>\n",
+       "      <th>course_name</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>New Prof</td>\n",
+       "      <td>New IA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>New Prof</td>\n",
+       "      <td>Data Mining</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>New Prof</td>\n",
+       "      <td>Intro to Data</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     p_name     course_name\n",
+       "0  New Prof         New IA \n",
+       "1  New Prof     Data Mining\n",
+       "2  New Prof  Intro to Data "
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df= pandas.read_sql_query(sql_q2,conn)\n",
+    "df[:]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Q3"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sql_q3 = \"\"\"\n",
+    "        select course_num,\n",
+    "        count(course_num) as enrolled\n",
+    "        from gp8.enroll_list\n",
+    "        group by course_num\n",
+    "        order by enrolled desc\n",
+    "        \"\"\"\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<matplotlib.axes._subplots.AxesSubplot at 0x7fdc2a5fd828>"
+      ]
+     },
+     "execution_count": 32,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "df= pandas.read_sql_query(sql_q3,conn)\n",
+    "df.plot.bar(y='enrolled',x='course_num')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Q4"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sql_q4 = \"\"\"\n",
+    "        select gp8.professor.p_name,\n",
+    "        count(gp8.course.course_name) as teaching_number\n",
+    "        from gp8.professor\n",
+    "        inner join gp8.course\n",
+    "        on gp8.professor.p_email = gp8.course.p_email\n",
+    "        group by professor.p_name\n",
+    "        order by teaching_number desc\n",
+    "        \"\"\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<matplotlib.axes._subplots.AxesSubplot at 0x7fdc2a5ccba8>"
+      ]
+     },
+     "execution_count": 34,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "df= pandas.read_sql_query(sql_q4,conn)\n",
+    "df.plot.bar(y='teaching_number',x='p_name')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Q5"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 58,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sql_q5_professor = \"\"\"\n",
+    "                    insert into gp8.professor(p_email , p_name, office)\n",
+    "                    values('{}','{}','{}')\n",
+    "                    \"\"\".format('newp@jmu.edu','new p','new off')\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 59,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cur.execute(sql_q5_professor)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "conn.commit()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>p_email</th>\n",
+       "      <th>p_name</th>\n",
+       "      <th>office</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>hendrinx@jmu.edu</td>\n",
+       "      <td>Noel Hendrickson</td>\n",
+       "      <td>N/A</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>moore8ka@jmu.edu</td>\n",
+       "      <td>Kathleen Moore</td>\n",
+       "      <td>ISAT 116</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>marrinsp@jmu.edu</td>\n",
+       "      <td>Stephen Marrin</td>\n",
+       "      <td>EnGeo 2104</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>new_p@jmu.edu</td>\n",
+       "      <td>New Prof</td>\n",
+       "      <td>New</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>newp@jmu.edu</td>\n",
+       "      <td>new p</td>\n",
+       "      <td>new off</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            p_email            p_name      office\n",
+       "0  hendrinx@jmu.edu  Noel Hendrickson         N/A\n",
+       "1  moore8ka@jmu.edu    Kathleen Moore    ISAT 116\n",
+       "2  marrinsp@jmu.edu    Stephen Marrin  EnGeo 2104\n",
+       "3     new_p@jmu.edu          New Prof         New\n",
+       "4      newp@jmu.edu             new p     new off"
+      ]
+     },
+     "execution_count": 61,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df=pandas.read_sql_query('select * from gp8.professor',conn)\n",
+    "df[:]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sql_q5_course = \"\"\"\n",
+    "                    insert into gp8.course(course_num, course_name, room_num, p_email)\n",
+    "                    values('{}','{}','{}','{}')\n",
+    "                    \"\"\".format('ia new','new course','online','newp@jmu.edu')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cur.execute(sql_q5_course)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "conn.commit()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>course_num</th>\n",
+       "      <th>course_name</th>\n",
+       "      <th>room_num</th>\n",
+       "      <th>p_email</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>NewIA</td>\n",
+       "      <td>New IA</td>\n",
+       "      <td>New</td>\n",
+       "      <td>new_p@jmu.edu</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>IA 340</td>\n",
+       "      <td>Data Mining</td>\n",
+       "      <td>Online</td>\n",
+       "      <td>new_p@jmu.edu</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>IA 240</td>\n",
+       "      <td>Intro to Data</td>\n",
+       "      <td>Online</td>\n",
+       "      <td>new_p@jmu.edu</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>ia new</td>\n",
+       "      <td>new course</td>\n",
+       "      <td>online</td>\n",
+       "      <td>newp@jmu.edu</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  course_num     course_name room_num        p_email\n",
+       "0      NewIA         New IA       New  new_p@jmu.edu\n",
+       "1     IA 340     Data Mining   Online  new_p@jmu.edu\n",
+       "2     IA 240  Intro to Data    Online  new_p@jmu.edu\n",
+       "3     ia new      new course   online   newp@jmu.edu"
+      ]
+     },
+     "execution_count": 65,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df=pandas.read_sql_query('select * from gp8.course',conn)\n",
+    "df[:]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Q6"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sql_q6_course = \"\"\"\n",
+    "                update gp8.course\n",
+    "                set p_email = '{}'\n",
+    "                where p_email = '{}'\n",
+    "                \"\"\".format('new_p@jmu.edu','weixx@jmu.edu')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cur.execute(sql_q6_course)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#cur.execute('ROLLBACK')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "conn.commit()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>course_num</th>\n",
+       "      <th>course_name</th>\n",
+       "      <th>room_num</th>\n",
+       "      <th>p_email</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>NewIA</td>\n",
+       "      <td>New IA</td>\n",
+       "      <td>New</td>\n",
+       "      <td>new_p@jmu.edu</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>IA 340</td>\n",
+       "      <td>Data Mining</td>\n",
+       "      <td>Online</td>\n",
+       "      <td>new_p@jmu.edu</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>IA 240</td>\n",
+       "      <td>Intro to Data</td>\n",
+       "      <td>Online</td>\n",
+       "      <td>new_p@jmu.edu</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>ia new</td>\n",
+       "      <td>new course</td>\n",
+       "      <td>online</td>\n",
+       "      <td>newp@jmu.edu</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  course_num     course_name room_num        p_email\n",
+       "0      NewIA         New IA       New  new_p@jmu.edu\n",
+       "1     IA 340     Data Mining   Online  new_p@jmu.edu\n",
+       "2     IA 240  Intro to Data    Online  new_p@jmu.edu\n",
+       "3     ia new      new course   online   newp@jmu.edu"
+      ]
+     },
+     "execution_count": 71,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df=pandas.read_sql_query('select * from gp8.course',conn)\n",
+    "df[:]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### for above table, professor emails were already switched from weixx@jmu.edu to new_p@jmu.edu, hence why the change is not shown "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 88,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sql_q6_professor = \"\"\"\n",
+    "                delete from gp8.professor\n",
+    "                where p_email = '{}'\n",
+    "                \"\"\".format('hendrinx@jmu.edu')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### changed the email to delete from weixx@jmu.edu to hendrinx@jmu.edu, wei email was already deleted last lab, and couldn't delete new professor email since it is still connected to courses.  Deleted extra email in table that was not connected to any courses. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 89,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cur.execute(sql_q6_professor)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 90,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "conn.commit()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 91,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>p_email</th>\n",
+       "      <th>p_name</th>\n",
+       "      <th>office</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>moore8ka@jmu.edu</td>\n",
+       "      <td>Kathleen Moore</td>\n",
+       "      <td>ISAT 116</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>marrinsp@jmu.edu</td>\n",
+       "      <td>Stephen Marrin</td>\n",
+       "      <td>EnGeo 2104</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>new_p@jmu.edu</td>\n",
+       "      <td>New Prof</td>\n",
+       "      <td>New</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>newp@jmu.edu</td>\n",
+       "      <td>new p</td>\n",
+       "      <td>new off</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            p_email          p_name      office\n",
+       "0  moore8ka@jmu.edu  Kathleen Moore    ISAT 116\n",
+       "1  marrinsp@jmu.edu  Stephen Marrin  EnGeo 2104\n",
+       "2     new_p@jmu.edu        New Prof         New\n",
+       "3      newp@jmu.edu           new p     new off"
+      ]
+     },
+     "execution_count": 91,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df=pandas.read_sql_query('select * from gp8.professor',conn)\n",
+    "df[:]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Close Connection"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 92,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cur.close()\n",
+    "conn.close()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "conda_python3",
+   "language": "python",
+   "name": "conda_python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.10"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
